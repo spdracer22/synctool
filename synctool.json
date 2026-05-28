@@ -1,0 +1,17 @@
+{
+  "references-dir": "references",
+  "dependencies": [
+    {
+      "repo": "https://github.com/mattpocock/skills",
+      "mappings": [{ "from": "skills", "to": "mattpocock/skills" }]
+    },
+    {
+      "repo": "https://github.com/microsoft/playwright-cli",
+      "mappings": [{ "from": "skills", "to": "playwright-cli/skills" }]
+    },
+    {
+      "repo": "https://github.com/anthropics/skills",
+      "mappings": [{ "from": "skills", "to": "anthropics/skills" }]
+    }
+  ]
+}
