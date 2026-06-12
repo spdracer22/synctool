@@ -3,18 +3,23 @@
 import { cp, mkdir, rm, stat } from "node:fs/promises";
 import * as path from "node:path";
 import { $, randomUUIDv7 } from "bun";
+import { findUp } from "find-up";
 import ora from "ora";
 import { loadConfig } from "./lib/config";
 
 const __dir = path.dirname(Bun.main);
 //console.debug(__dir);
 
+const configFile = await findUp("synctool.json");
+
+if (!configFile) {
+  console.error("synctool.json not found");
+  process.exit(1);
+}
+
 let config;
-let configFile;
 try {
-  const result = await loadConfig();
-  config = result.config;
-  configFile = result.configFile;
+  config = await loadConfig(configFile);
 } catch (error) {
   console.error(error instanceof Error ? error.message : "Failed to load config");
   process.exit(1);
