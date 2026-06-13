@@ -1,3 +1,1 @@
-export interface SyncSource {
-  sync(from: string, to: string): Promise<void>;
-}
+export type SyncSource = (from: string, to: string) => Promise<void>;

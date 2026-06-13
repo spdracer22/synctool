@@ -1,17 +1,12 @@
 import { cp, mkdir, rm, stat } from "node:fs/promises";
 import * as path from "node:path";
-import { $, file } from "bun";
+import { $ } from "bun";
 import { randomUUIDv7 } from "bun";
 import type { SyncSource } from "../types/SyncSource.js";
 
-export class CurlSource implements SyncSource {
-  constructor(
-    private url: string,
-    private tempDir: string,
-  ) {}
-
-  async sync(from: string, to: string): Promise<void> {
-    const tempSubDirPath = path.join(this.tempDir, randomUUIDv7());
+export const curlSource = (url: string, tempDir: string): SyncSource =>
+  async (from: string, to: string): Promise<void> => {
+    const tempSubDirPath = path.join(tempDir, randomUUIDv7());
     await mkdir(tempSubDirPath, { recursive: true });
 
     const toDirExists =
@@ -21,7 +16,7 @@ export class CurlSource implements SyncSource {
 
     const archivePath = path.join(tempSubDirPath, "archive.tar.gz");
 
-    await $`curl --silent --location --output "${archivePath}" "${this.url}"`;
+    await $`curl --silent --location --output "${archivePath}" "${url}"`;
 
     await $`cd "${tempSubDirPath}" && tar -xzf "$(basename "${archivePath}")"`;
 
@@ -29,5 +24,4 @@ export class CurlSource implements SyncSource {
     await mkdir(path.dirname(to), { recursive: true });
     await cp(extractedPath, to, { recursive: true });
     await rm(tempSubDirPath, { recursive: true, force: true });
-  }
-}
+  };

@@ -43,7 +43,7 @@ for (const dep of config.dependencies) {
 
     try {
       const __toDir = path.join(__refDir, map.to);
-      await source.sync(map.from, __toDir);
+      await source(map.from, __toDir);
       spinner.succeed(`${statusText}...Done!`);
     } catch (error) {
       spinner.fail(`${statusText}...Failed!`);
