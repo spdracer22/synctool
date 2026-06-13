@@ -5,7 +5,6 @@ import * as path from "node:path";
 import { $, randomUUIDv7 } from "bun";
 import ora from "ora";
 import { loadConfig } from "./lib/config";
-import { findUp } from "find-up";
 
 const __dir = path.dirname(Bun.main);
 //console.debug(__dir);
@@ -18,8 +17,6 @@ try {
   process.exit(1);
 }
 
-const configFile = (await findUp("synctool.json"))!;
-
 const __tempDir = path.join(__dir, ".tmp");
 
 const tempDirExists =
@@ -29,7 +26,7 @@ const tempDirExists =
 
 if (!tempDirExists) await mkdir(__tempDir, { recursive: true });
 
-const __refDir = path.join(path.dirname(configFile), config["references-dir"]);
+const __refDir = path.join(path.dirname(config.configPath), config["references-dir"]);
 
 const refDirExists =
   (await stat(__refDir, { throwIfNoEntry: false }))?.isDirectory() ?? false;

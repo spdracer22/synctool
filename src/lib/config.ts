@@ -17,7 +17,7 @@ const ConfigSchema = z.object({
   dependencies: z.array(DependencySchema),
 });
 
-export type Config = z.infer<typeof ConfigSchema>;
+export type Config = z.infer<typeof ConfigSchema> & { configPath: string };
 
 export async function loadConfig(): Promise<Config> {
   const configFile = await findUp("synctool.json");
@@ -27,5 +27,7 @@ export async function loadConfig(): Promise<Config> {
   }
 
   const jsonData = await file(configFile).json();
-  return ConfigSchema.parse(jsonData);
+  const validated = ConfigSchema.parse(jsonData);
+
+  return { ...validated, configPath: configFile };
 }
