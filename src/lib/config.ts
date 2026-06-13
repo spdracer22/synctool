@@ -19,7 +19,13 @@ const ConfigSchema = z.object({
 
 export type Config = z.infer<typeof ConfigSchema>;
 
-export async function loadConfig(filePath: string): Promise<Config> {
-  const jsonData = await file(filePath).json();
+export async function loadConfig(): Promise<Config> {
+  const configFile = await findUp("synctool.json");
+
+  if (!configFile) {
+    throw new Error("synctool.json not found");
+  }
+
+  const jsonData = await file(configFile).json();
   return ConfigSchema.parse(jsonData);
 }
