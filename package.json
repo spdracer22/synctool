@@ -8,14 +8,15 @@
 	},
 	"scripts": {
 		"start": "bun ./src/index.ts",
-		"check": "tsc --noEmit && bunx --bun @biomejs/biome check"
+		"check": "tsc --noEmit && bunx --bun @biomejs/biome check",
+		"format": "bunx --bun @biomejs/biome check --fix"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.1",
 		"@types/bun": "latest"
 	},
 	"peerDependencies": {
-		"typescript": "^5"
+		"typescript": "6.0.3"
 	},
 	"dependencies": {
 		"find-up": "^8.0.0",

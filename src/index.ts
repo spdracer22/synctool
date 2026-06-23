@@ -3,9 +3,9 @@
 import { mkdir, rm, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import ora from 'ora';
-import type { Config } from './types/config';
 import { loadConfig } from './lib/config';
 import { createSource } from './sources/createSource';
+import type { Config } from './types/config';
 
 const __dir = path.dirname(Bun.main);
 //console.debug(__dir);
@@ -26,6 +26,11 @@ const tempDirExists =
 	(await stat(__tempDir, { throwIfNoEntry: false }))?.isDirectory() ?? false;
 
 if (!tempDirExists) await mkdir(__tempDir, { recursive: true });
+
+if (!config.configPath) {
+	console.error('Config error: configPath not specified.');
+	process.exit(1);
+}
 
 const __refDir = path.join(
 	path.dirname(config.configPath),
