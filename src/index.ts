@@ -2,23 +2,20 @@
 
 import { mkdir, rm, stat } from "node:fs/promises";
 import * as path from "node:path";
-import { file } from "bun";
-import { findUp } from "find-up";
+import { $, randomUUIDv7 } from "bun";
 import ora from "ora";
-import { ConfigSchema } from "./types/config.js";
-import { createSource } from "./sources/createSource.js";
+import { loadConfig } from "./lib/config";
 
 const __dir = path.dirname(Bun.main);
+//console.debug(__dir);
 
-const configFile = await findUp("synctool.json");
-
-if (!configFile) {
-  console.error("synctool.json not found");
+let config;
+try {
+  config = await loadConfig();
+} catch (error) {
+  console.error(error instanceof Error ? error.message : "Failed to load config");
   process.exit(1);
 }
-
-const configData = await file(configFile).json();
-const config = ConfigSchema.parse(configData);
 
 const __tempDir = path.join(__dir, ".tmp");
 
@@ -27,7 +24,7 @@ const tempDirExists =
 
 if (!tempDirExists) await mkdir(__tempDir, { recursive: true });
 
-const __refDir = path.join(path.dirname(configFile), config["references-dir"]);
+const __refDir = path.join(path.dirname(config.configPath), config["references-dir"]);
 
 const refDirExists =
   (await stat(__refDir, { throwIfNoEntry: false }))?.isDirectory() ?? false;
