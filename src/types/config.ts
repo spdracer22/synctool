@@ -1,37 +1,37 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const MappingSchema = z.object({
-  from: z.string(),
-  to: z.string(),
+	from: z.string(),
+	to: z.string(),
 });
 
 const GitSourceSchema = z.object({
-  type: z.literal("git"),
-  repo: z.string().url(),
-  mappings: z.array(MappingSchema),
+	type: z.literal('git'),
+	repo: z.string().url(),
+	mappings: z.array(MappingSchema),
 });
 
 const CurlSourceSchema = z.object({
-  type: z.literal("curl"),
-  url: z.string().url(),
-  mappings: z.array(MappingSchema),
+	type: z.literal('curl'),
+	url: z.string().url(),
+	mappings: z.array(MappingSchema),
 });
 
 const LocalCopySourceSchema = z.object({
-  type: z.literal("local-copy"),
-  path: z.string(),
-  mappings: z.array(MappingSchema),
+	type: z.literal('local-copy'),
+	path: z.string(),
+	mappings: z.array(MappingSchema),
 });
 
 const DependencySchema = z.union([
-  GitSourceSchema,
-  CurlSourceSchema,
-  LocalCopySourceSchema,
+	GitSourceSchema,
+	CurlSourceSchema,
+	LocalCopySourceSchema,
 ]);
 
 export const ConfigSchema = z.object({
-  "references-dir": z.string(),
-  dependencies: z.array(DependencySchema),
+	'references-dir': z.string(),
+	dependencies: z.array(DependencySchema),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

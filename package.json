@@ -1,24 +1,25 @@
 {
-  "name": "@spdracer22/synctool",
-  "module": "src/index.ts",
-  "type": "module",
-  "private": true,
-  "bin": {
-    "synctool": "src/index.ts"
-  },
-  "scripts": {
-    "start": "bun ./src/index.ts"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.4.15",
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "find-up": "^8.0.0",
-    "ora": "^9.4.0",
-    "zod": "^4.4.3"
-  }
+	"name": "@spdracer22/synctool",
+	"module": "src/index.ts",
+	"type": "module",
+	"private": true,
+	"bin": {
+		"synctool": "src/index.ts"
+	},
+	"scripts": {
+		"start": "bun ./src/index.ts",
+		"check": "bunx --bun @biomejs/biome check"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.1",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"find-up": "^8.0.0",
+		"ora": "^9.4.0",
+		"zod": "^4.4.3"
+	}
 }
