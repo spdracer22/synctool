@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"start": "bun ./src/index.ts",
-		"check": "bunx --bun @biomejs/biome check"
+		"check": "tsc --noEmit && bunx --bun @biomejs/biome check"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.1",

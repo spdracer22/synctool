@@ -7,13 +7,13 @@ const MappingSchema = z.object({
 
 const GitSourceSchema = z.object({
 	type: z.literal('git'),
-	repo: z.string().url(),
+	repo: z.url(),
 	mappings: z.array(MappingSchema),
 });
 
 const CurlSourceSchema = z.object({
 	type: z.literal('curl'),
-	url: z.string().url(),
+	url: z.url(),
 	mappings: z.array(MappingSchema),
 });
 
@@ -32,6 +32,7 @@ const DependencySchema = z.union([
 export const ConfigSchema = z.object({
 	'references-dir': z.string(),
 	dependencies: z.array(DependencySchema),
+	configPath: z.string().optional(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

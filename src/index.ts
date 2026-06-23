@@ -3,8 +3,9 @@
 import { mkdir, rm, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import ora from 'ora';
-import type { Config } from './lib/config';
+import type { Config } from './types/config';
 import { loadConfig } from './lib/config';
+import { createSource } from './sources/createSource';
 
 const __dir = path.dirname(Bun.main);
 //console.debug(__dir);
