@@ -1,25 +1,19 @@
-import { cp, mkdir, rm, stat } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import * as path from 'node:path';
 import { $, randomUUIDv7 } from 'bun';
-import type { SyncSource } from '../schemas/SyncSource';
+import type { SourceContext } from '../lib/SourceContext';
+import type { CurlInput } from '../schemas/source-curl';
 
-export const curlSource =
-	(url: string, tempDir: string): SyncSource =>
-	async (to: string): Promise<void> => {
-		const tempSubDirPath = path.join(tempDir, randomUUIDv7());
-		await mkdir(tempSubDirPath, { recursive: true });
+export async function curlSource(
+	source: CurlInput,
+	context: SourceContext,
+): Promise<string> {
+	const tempSubDirPath = path.join(context.tempDir, randomUUIDv7());
+	await mkdir(tempSubDirPath, { recursive: true });
 
-		const toExists = (await stat(to, { throwIfNoEntry: false })) !== undefined;
+	const downloadPath = path.join(tempSubDirPath, 'download');
 
-		if (toExists) await rm(to, { recursive: true, force: true });
+	await $`curl --silent --location --output "${downloadPath}" "${source.url}"`;
 
-		const downloadPath = path.join(tempSubDirPath, 'download');
-
-		await $`curl --silent --location --output "${downloadPath}" "${url}"`;
-
-		const sourcePath = downloadPath;
-
-		await mkdir(path.dirname(to), { recursive: true });
-		await cp(sourcePath, to, { recursive: true });
-		await rm(tempSubDirPath, { recursive: true, force: true });
-	};
+	return tempSubDirPath;
+}

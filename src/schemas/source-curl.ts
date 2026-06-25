@@ -1,9 +1,11 @@
 import { z } from 'zod';
+import { SourceEnvelopeSchema } from './source-envelope';
 
-import { MappingSchema } from './mapping';
-
-export const CurlSourceSchema = z.object({
-	type: z.literal('curl'),
+export const CurlInputSchema = z.object({
 	url: z.url(),
-	mappings: z.array(MappingSchema),
 });
+
+export const CurlSourceSchema = SourceEnvelopeSchema('curl', CurlInputSchema);
+
+export type CurlInput = z.infer<typeof CurlInputSchema>;
+export type CurlSource = z.infer<typeof CurlSourceSchema>;

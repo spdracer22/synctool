@@ -1,8 +1,11 @@
 import { z } from 'zod';
-import { MappingSchema } from './mapping';
+import { SourceEnvelopeSchema } from './source-envelope';
 
-export const GitSourceSchema = z.object({
-	type: z.literal('git'),
+export const GitInputSchema = z.object({
 	repo: z.url(),
-	mappings: z.array(MappingSchema),
 });
+
+export const GitSourceSchema = SourceEnvelopeSchema('git', GitInputSchema);
+
+export type GitInput = z.infer<typeof GitInputSchema>;
+export type GitSource = z.infer<typeof GitSourceSchema>;

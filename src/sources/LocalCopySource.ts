@@ -1,16 +1,9 @@
-import { cp, mkdir, rm, stat } from 'node:fs/promises';
-import * as path from 'node:path';
-import type { SyncSource } from '../schemas/SyncSource';
+import type { SourceContext } from '../lib/SourceContext';
+import type { LocalCopyInput } from '../schemas/source-local';
 
-export const localCopySource =
-	(basePath: string): SyncSource =>
-	async (from: string, to: string): Promise<void> => {
-		const fromPath = path.join(basePath, from);
-		const toDirExists =
-			(await stat(to, { throwIfNoEntry: false }))?.isDirectory() ?? false;
-
-		if (toDirExists) await rm(to, { recursive: true, force: true });
-
-		await mkdir(path.dirname(to), { recursive: true });
-		await cp(fromPath, to, { recursive: true });
-	};
+export async function localCopySource(
+	source: LocalCopyInput,
+	_context: SourceContext,
+): Promise<string> {
+	return source.path;
+}
