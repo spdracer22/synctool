@@ -1,7 +1,7 @@
 import { cp, mkdir, rm, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import { $, randomUUIDv7 } from 'bun';
-import type { SyncSource } from '../types/SyncSource.js';
+import type { SyncSource } from '../schemas/SyncSource';
 
 export const gitSource =
 	(repo: string, tempDir: string): SyncSource =>

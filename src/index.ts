@@ -4,8 +4,8 @@ import { mkdir, rm, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import ora from 'ora';
 import { loadConfig } from './lib/config';
+import type { Config } from './schemas/config';
 import { createSource } from './sources/createSource';
-import type { Config } from './types/config';
 
 const __dir = path.dirname(Bun.main);
 //console.debug(__dir);
@@ -42,7 +42,7 @@ const refDirExists =
 
 if (!refDirExists) await mkdir(__refDir, { recursive: true });
 
-for (const dep of config.dependencies) {
+for (const dep of config.sources) {
 	const source = createSource(dep, __tempDir);
 
 	for (const map of dep.mappings) {

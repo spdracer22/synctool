@@ -1,19 +1,19 @@
-import type { Dependency } from '../types/config.js';
-import type { SyncSource } from '../types/SyncSource.js';
-import { curlSource } from './CurlSource.js';
-import { gitSource } from './GitSource.js';
-import { localCopySource } from './LocalCopySource.js';
+import type { SyncSource } from '../schemas/SyncSource';
+import type { Source } from '../schemas/source';
+import { curlSource } from './CurlSource';
+import { gitSource } from './GitSource';
+import { localCopySource } from './LocalCopySource';
 
-export function createSource(dep: Dependency, tempDir: string): SyncSource {
-	switch (dep.type) {
+export function createSource(source: Source, tempDir: string): SyncSource {
+	switch (source.type) {
 		case 'git':
-			return gitSource(dep.repo, tempDir);
+			return gitSource(source.repo, tempDir);
 		case 'curl':
-			return curlSource(dep.url, tempDir);
+			return curlSource(source.url, tempDir);
 		case 'local-copy':
-			return localCopySource(dep.path);
+			return localCopySource(source.path);
 		default: {
-			const exhaustive: never = dep;
+			const exhaustive: never = source;
 			throw new Error(`Unknown sync source type: ${exhaustive}`);
 		}
 	}

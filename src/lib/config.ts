@@ -1,6 +1,6 @@
 import { file } from 'bun';
 import { findUp } from 'find-up';
-import { type Config, ConfigSchema } from '../types/config.js';
+import { type Config, ConfigSchema } from '../schemas/config';
 
 export async function loadConfig(): Promise<Config> {
 	const configFile = await findUp('synctool.json');

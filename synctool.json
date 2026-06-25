@@ -1,6 +1,6 @@
 {
 	"references-dir": "references",
-	"dependencies": [
+	"sources": [
 		{
 			"type": "git",
 			"repo": "https://github.com/mattpocock/skills",

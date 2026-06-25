@@ -1,6 +1,6 @@
 import { cp, mkdir, rm, stat } from 'node:fs/promises';
 import * as path from 'node:path';
-import type { SyncSource } from '../types/SyncSource.js';
+import type { SyncSource } from '../schemas/SyncSource';
 
 export const localCopySource =
 	(basePath: string): SyncSource =>

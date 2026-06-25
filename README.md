@@ -49,11 +49,14 @@ This will clone the specified repos (using sparse checkout for efficiency), copy
 The local directory where synced content will be placed. This is created relative to wherever your `synctool.json` file lives.
 
 **`dependencies`** (array, required)  
-A list of external repositories to pull from. Each dependency has:
+A list of external sources to pull from. Each dependency has:
 
-- **`repo`** (string) — The Git URL of the repository to clone
+- **`type`** (string) — Source type: `git`, `curl`, or `local-copy`
+- For `git`: **`repo`** (string) — The Git URL of the repository to clone
+- For `curl`: **`url`** (string) — The URL of the file to download
+  - **`unzip`** (boolean, optional, default `false`) — Unzip the downloaded file before applying mappings
 - **`mappings`** (array) — One or more source→destination mappings
-  - **`from`** (string) — Path within the repo to pull (e.g., `docs/guides`)
+  - **`from`** (string) — Path within the source to pull (ignored for non-unzipped `curl` downloads)
   - **`to`** (string) — Relative path within `references-dir` to place it
 
 ### Example Configuration
