@@ -1,20 +1,21 @@
 {
-	"references-dir": "references",
 	"sources": [
 		{
 			"type": "git",
 			"repo": "https://github.com/mattpocock/skills",
-			"mappings": [{ "from": "skills", "to": "mattpocock/skills" }]
+			"mappings": [{ "from": "skills", "to": "references/mattpocock/skills" }]
 		},
 		{
 			"type": "git",
 			"repo": "https://github.com/microsoft/playwright-cli",
-			"mappings": [{ "from": "skills", "to": "playwright-cli/skills" }]
+			"mappings": [
+				{ "from": "skills", "to": "references/playwright-cli/skills" }
+			]
 		},
 		{
 			"type": "git",
 			"repo": "https://github.com/anthropics/skills",
-			"mappings": [{ "from": "skills", "to": "anthropics/skills" }]
+			"mappings": [{ "from": "skills", "to": "references/anthropics/skills" }]
 		}
 	]
 }

@@ -36,15 +36,7 @@ if (!config.configPath) {
 	process.exit(1);
 }
 
-const __refDir = path.join(
-	path.dirname(config.configPath),
-	config['references-dir'],
-);
-
-const refDirExists =
-	(await stat(__refDir, { throwIfNoEntry: false }))?.isDirectory() ?? false;
-
-if (!refDirExists) await mkdir(__refDir, { recursive: true });
+const configDir = path.dirname(config.configPath);
 
 for (const dep of config.sources) {
 	const sourceSpinner = createSpinner(`Loading ${dep.type} source...`);
@@ -60,7 +52,7 @@ for (const dep of config.sources) {
 
 	for (const map of dep.mappings) {
 		const fromPath = path.join(sourcePath, map.from);
-		const toPath = path.join(__refDir, map.to);
+		const toPath = path.join(configDir, map.to);
 		const statusText = `Syncing ${fromPath} >> ${toPath}`;
 		const spinner = createSpinner(`${statusText}...`);
 

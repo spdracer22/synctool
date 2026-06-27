@@ -18,14 +18,14 @@ In your project root, create a `synctool.json` file that defines what to sync:
 
 ```json
 {
-  "references-dir": "references",
-  "dependencies": [
+  "sources": [
     {
+      "type": "git",
       "repo": "https://github.com/example/repo.git",
       "mappings": [
         {
           "from": "docs/guides",
-          "to": "example-guides"
+          "to": "references/example-guides"
         }
       ]
     }
@@ -39,51 +39,51 @@ In your project root, create a `synctool.json` file that defines what to sync:
 bun src/index.ts
 ```
 
-This will clone the specified repos (using sparse checkout for efficiency), copy the mapped directories into your `references-dir`, and clean up temporary files.
+This will clone the specified repos (using sparse checkout for efficiency), copy the mapped directories to their configured `to` paths relative to the directory containing `synctool.json`, and clean up temporary files.
 
 ## Configuration
 
 ### synctool.json Schema
 
-**`references-dir`** (string, required)  
-The local directory where synced content will be placed. This is created relative to wherever your `synctool.json` file lives.
-
-**`dependencies`** (array, required)  
-A list of external sources to pull from. Each dependency has:
+**`sources`** (array, required)  
+A list of external sources to pull from. Each source has:
 
 - **`type`** (string) — Source type: `git`, `curl`, or `local-copy`
 - For `git`: **`repo`** (string) — The Git URL of the repository to clone
 - For `curl`: **`url`** (string) — The URL of the file to download
   - **`unzip`** (boolean, optional, default `false`) — Unzip the downloaded file before applying mappings
 - **`mappings`** (array) — One or more source→destination mappings
-  - **`from`** (string) — Path within the source to pull (ignored for non-unzipped `curl` downloads)
-  - **`to`** (string) — Relative path within `references-dir` to place it
+  - **`from`** (string) — Relative path within the source to pull (ignored for non-unzipped `curl` downloads)
+  - **`to`** (string) — Destination path relative to the directory containing `synctool.json`
+
+Mapping paths must be relative paths and must not escape their base directory. Absolute paths such as `C:/users/me/somedir/mattpocock/skills` or paths containing `..` are rejected.
 
 ### Example Configuration
 
 ```json
 {
-  "references-dir": "references",
-  "dependencies": [
+  "sources": [
     {
+      "type": "git",
       "repo": "https://github.com/vercel/next.js.git",
       "mappings": [
         {
           "from": "docs/api-routes",
-          "to": "nextjs-api-docs"
+          "to": "references/nextjs-api-docs"
         },
         {
           "from": "examples",
-          "to": "nextjs-examples"
+          "to": "references/nextjs-examples"
         }
       ]
     },
     {
+      "type": "git",
       "repo": "https://github.com/microsoft/TypeScript.git",
       "mappings": [
         {
           "from": "doc/spec.md",
-          "to": "typescript-spec"
+          "to": "references/typescript-spec"
         }
       ]
     }
@@ -102,7 +102,7 @@ Synctool uses [sparse checkout](https://git-scm.com/docs/git-sparse-checkout) to
 
 1. Creates a temporary directory
 2. Clones the repo with sparse checkout
-3. Copies the mapped directory to your `references-dir`
+3. Copies the mapped directory to the configured `to` path relative to `synctool.json`
 4. Cleans up temporary files
 
 This makes syncing large repositories fast and storage-efficient.
