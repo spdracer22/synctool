@@ -6,10 +6,18 @@ Synctool is a CLI tool that pulls specific directories from external Git reposit
 
 ### Installation
 
-This project uses [Bun](https://bun.sh). Install it if you haven't already, then:
+This project uses the [Bun](https://bun.sh) runtime. Install Bun first, then install the CLI globally from this repository or from npm after publishing:
 
 ```bash
-bun install
+# from a local checkout
+bun install -g .
+# or
+npm install -g .
+
+# after publishing
+bun install -g @spdracer22/synctool
+# or
+npm install -g @spdracer22/synctool
 ```
 
 ### Create a Configuration File
@@ -36,7 +44,7 @@ In your project root, create a `synctool.json` file that defines what to sync:
 ### Run synctool
 
 ```bash
-bun src/index.ts
+synctool
 ```
 
 This will clone the specified repos (using sparse checkout for efficiency), copy the mapped directories to their configured `to` paths relative to the directory containing `synctool.json`, and clean up temporary files.

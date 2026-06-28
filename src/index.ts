@@ -1,14 +1,12 @@
 #!/usr/bin/env bun
 
-import { cp, mkdir, rm, stat } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, rm, stat } from 'node:fs/promises';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import ora from 'ora';
 import { loadConfig } from './lib/config';
 import { materializeSource } from './lib/materializeSource';
 import type { Config } from './schemas/config';
-
-const __dir = path.dirname(Bun.main);
-//console.debug(__dir);
 
 function createSpinner(text: string) {
 	return ora({ text, discardStdin: false }).start();
@@ -24,12 +22,7 @@ try {
 	process.exit(1);
 }
 
-const __tempDir = path.join(__dir, '.tmp');
-
-const tempDirExists =
-	(await stat(__tempDir, { throwIfNoEntry: false }))?.isDirectory() ?? false;
-
-if (!tempDirExists) await mkdir(__tempDir, { recursive: true });
+const __tempDir = await mkdtemp(path.join(os.tmpdir(), 'synctool-'));
 
 if (!config.configPath) {
 	console.error('Config error: configPath not specified.');

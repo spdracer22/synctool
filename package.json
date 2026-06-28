@@ -2,9 +2,15 @@
 	"name": "@spdracer22/synctool",
 	"module": "src/index.ts",
 	"type": "module",
-	"private": true,
+	"files": [
+		"src",
+		"README.md"
+	],
 	"bin": {
-		"synctool": "src/index.ts"
+		"synctool": "./src/index.ts"
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"start": "bun ./src/index.ts",
@@ -13,9 +19,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.1",
-		"@types/bun": "latest"
-	},
-	"peerDependencies": {
+		"@types/bun": "latest",
 		"typescript": "6.0.3"
 	},
 	"dependencies": {
