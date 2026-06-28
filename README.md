@@ -1,6 +1,33 @@
 # synctool
 
-Synctool is a CLI tool that pulls specific directories from external Git repositories and syncs them into your local project. It's useful for aggregating reference documentation, templates, or other resources from multiple sources into a single location.
+`synctool` is a CLI tool created to _simply_ sync AI agent skills into your local project so you can review them, selectively adopt them, or modify them before use.
+
+And, it turns out to be a handy runner that can be used to keep any data your project requires _fresh_.
+
+## Skills Abilities
+ 
+- Pull skills from external sources into a **central reference directory** (not directly into agent directories)
+- **Selectively promote** skills to active use rather than auto-syncing everything
+- **Fork and modify** pulled skills to fit specific use cases without losing the upstream reference
+- Track upstream skill changes over time via **Git history**, enabling deliberate merges into local versions
+- Publish the curated/modified skill set back out as a custom skills repository
+
+## Extended Abilities
+ 
+Beyond just skills, the same sync mechanism can support pulling in any content an agent, skill, or project might consume — API specs, docs, data, other reference material.
+
+Out of the box, `synctool` supports:
+
+- git
+- simple download via `curl`
+- local file copy
+
+`synctool` provides a harness that:
+ 
+- Executes each source's fetch process
+- Copies output to the target location in the repo
+
+The workflow mirrors vendoring (like copying vs. `npm install`) — content is owned by the repo, changes are explicit, and upstream diffs are visible in Git.
 
 ## Quick Start
 
@@ -59,7 +86,6 @@ A list of external sources to pull from. Each source has:
 - **`type`** (string) — Source type: `git`, `curl`, or `local-copy`
 - For `git`: **`repo`** (string) — The Git URL of the repository to clone
 - For `curl`: **`url`** (string) — The URL of the file to download
-  - **`unzip`** (boolean, optional, default `false`) — Unzip the downloaded file before applying mappings
 - **`mappings`** (array) — One or more source→destination mappings
   - **`from`** (string) — Relative path within the source to pull (ignored for non-unzipped `curl` downloads)
   - **`to`** (string) — Destination path relative to the directory containing `synctool.json`
@@ -122,6 +148,3 @@ Synctool looks for `synctool.json` in the current directory and parent directori
 
 **Git clone fails**  
 Ensure you have Git installed and can access the repositories specified in your config. For private repos, you may need SSH keys or personal access tokens configured.
-
-**Permission errors on cleanup**  
-If cleanup fails, try removing the `.tmp` directory manually: `rm -rf .tmp`
