@@ -3,6 +3,7 @@ import { SourceEnvelopeSchema } from './source-envelope';
 
 export const CurlInputSchema = z.object({
 	url: z.url(),
+	extension: z.string().optional(),
 });
 
 export const CurlSourceSchema = SourceEnvelopeSchema('curl', CurlInputSchema);

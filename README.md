@@ -74,7 +74,7 @@ In your project root, create a `synctool.json` file that defines what to sync:
 synctool
 ```
 
-This will clone the specified repos (using sparse checkout for efficiency), copy the mapped directories to their configured `to` paths relative to the directory containing `synctool.json`, and clean up temporary files.
+This will clone the specified repos using Git's partial clone blob filter for efficiency, copy the mapped directories to their configured `to` paths relative to the directory containing `synctool.json`, and clean up temporary files.
 
 ## Configuration
 
@@ -86,6 +86,7 @@ A list of external sources to pull from. Each source has:
 - **`type`** (string) — Source type: `git`, `curl`, or `local-copy`
 - For `git`: **`repo`** (string) — The Git URL of the repository to clone
 - For `curl`: **`url`** (string) — The URL of the file to download
+- For `curl`: **`extension`** (string, optional) — File extension to use when the URL does not include one. If omitted and the URL has no extension, the file is saved as `data`.
 - **`mappings`** (array) — One or more source→destination mappings
   - **`from`** (string) — Relative path within the source to pull (ignored for non-unzipped `curl` downloads)
   - **`to`** (string) — Destination path relative to the directory containing `synctool.json`
@@ -132,14 +133,14 @@ When you run synctool, it will create:
 
 ## How It Works
 
-Synctool uses [sparse checkout](https://git-scm.com/docs/git-sparse-checkout) to efficiently clone only the directories you need, rather than downloading entire repositories. For each mapping, it:
+Synctool uses Git's [partial clone](https://git-scm.com/docs/partial-clone) support with `--filter=blob:none` to avoid downloading file contents until Git needs them. For each source, it:
 
 1. Creates a temporary directory
-2. Clones the repo with sparse checkout
-3. Copies the mapped directory to the configured `to` path relative to `synctool.json`
+2. Clones the repo with `--filter=blob:none`
+3. Copies each mapped path to the configured `to` path relative to `synctool.json`
 4. Cleans up temporary files
 
-This makes syncing large repositories fast and storage-efficient.
+This can make syncing large repositories more efficient, but it is not a sparse checkout: the repository tree is still cloned, and mapped file contents are fetched on demand when copied.
 
 ## Troubleshooting
 
