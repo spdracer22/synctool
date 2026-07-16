@@ -44,8 +44,13 @@ for (const dep of config.sources) {
 	}
 
 	for (const map of dep.mappings) {
-		const fromPath = path.join(sourcePath, map.from);
-		const toPath = path.join(configDir, map.to);
+		const fromPath =
+			'from' in map ? path.join(sourcePath, map.from) : sourcePath;
+		const mapsToDirectory = map.to.endsWith('/') || map.to.endsWith('\\');
+		const toPath =
+			'from' in map && mapsToDirectory
+				? path.join(configDir, map.to, path.basename(map.from))
+				: path.join(configDir, map.to);
 		const statusText = `Syncing ${fromPath} >> ${toPath}`;
 		const spinner = createSpinner(`${statusText}...`);
 

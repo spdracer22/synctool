@@ -1,12 +1,15 @@
 import { z } from 'zod';
-import { MappingSchema } from './mapping';
+import type { FromToMappingSchema, ToMappingSchema } from './mapping';
+
+type MappingSchema = typeof ToMappingSchema | typeof FromToMappingSchema;
 
 export function SourceEnvelopeSchema<
 	Type extends string,
 	Shape extends z.ZodRawShape,
->(type: Type, schema: z.ZodObject<Shape>) {
+	Mappings extends MappingSchema,
+>(type: Type, schema: z.ZodObject<Shape>, mappings: Mappings) {
 	return schema.extend({
 		type: z.literal(type),
-		mappings: z.array(MappingSchema),
+		mappings: z.array(mappings),
 	});
 }

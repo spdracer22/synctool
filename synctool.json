@@ -16,6 +16,11 @@
 			"type": "git",
 			"repo": "https://github.com/anthropics/skills",
 			"mappings": [{ "from": "skills", "to": "references/anthropics/skills" }]
+		},
+		{
+			"type": "curl",
+			"url": "https://platform.vertexvis.com/spec",
+			"mappings": [{ "to": "references/vertex-api/" },{ "to": "references/vertex-api/spec/spec.yaml" }]
 		}
 	]
 }

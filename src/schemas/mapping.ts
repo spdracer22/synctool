@@ -17,10 +17,12 @@ const RelativePathSchema = z
 			});
 		}
 	});
-
-export const MappingSchema = z.object({
-	from: RelativePathSchema,
+export const ToMappingSchema = z.object({
 	to: RelativePathSchema,
 });
 
-export type Mapping = z.infer<typeof MappingSchema>;
+export const FromToMappingSchema = ToMappingSchema.extend({
+  from: RelativePathSchema,
+});
+
+export type Mapping = z.infer<typeof ToMappingSchema> | z.infer<typeof FromToMappingSchema>;

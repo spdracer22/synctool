@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FromToMappingSchema } from './mapping';
 import { SourceEnvelopeSchema } from './source-envelope';
 
 export const LocalCopyInputSchema = z.object({
@@ -8,6 +9,7 @@ export const LocalCopyInputSchema = z.object({
 export const LocalCopySourceSchema = SourceEnvelopeSchema(
 	'local-copy',
 	LocalCopyInputSchema,
+	FromToMappingSchema,
 );
 
 export type LocalCopyInput = z.infer<typeof LocalCopyInputSchema>;
