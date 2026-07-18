@@ -22,7 +22,9 @@ export const ToMappingSchema = z.object({
 });
 
 export const FromToMappingSchema = ToMappingSchema.extend({
-  from: RelativePathSchema,
+	from: RelativePathSchema,
 });
 
-export type Mapping = z.infer<typeof ToMappingSchema> | z.infer<typeof FromToMappingSchema>;
+export type Mapping =
+	| z.infer<typeof ToMappingSchema>
+	| z.infer<typeof FromToMappingSchema>;

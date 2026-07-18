@@ -3,7 +3,29 @@
 		{
 			"type": "git",
 			"repo": "https://github.com/mattpocock/skills",
-			"mappings": [{ "from": "skills", "to": "references/mattpocock/skills" }]
+			"mappings": [
+				{ "from": "skills", "to": "references/mattpocock/skills" },
+				{
+					"from": "skills/engineering/grill-with-docs",
+					"to": ".agents/skills/grill-with-docs"
+				},
+				{
+					"from": "skills/engineering/domain-modeling",
+					"to": ".agents/skills/domain-modeling"
+				},
+				{
+					"from": "skills/productivity/grilling",
+					"to": ".agents/skills/grilling"
+				},
+				{
+					"from": "skills/engineering/codebase-design",
+					"to": ".agents/skills/codebase-design"
+				},
+				{
+					"from": "skills/engineering/improve-codebase-architecture",
+					"to": ".agents/skills/improve-codebase-architecture"
+				}
+			]
 		},
 		{
 			"type": "git",
@@ -20,7 +42,10 @@
 		{
 			"type": "curl",
 			"url": "https://platform.vertexvis.com/spec",
-			"mappings": [{ "to": "references/vertex-api/" },{ "to": "references/vertex-api/spec/spec.yaml" }]
+			"mappings": [
+				{ "to": "references/vertex-api/" },
+				{ "to": "references/vertex-api/spec/spec.yaml" }
+			]
 		}
 	]
 }

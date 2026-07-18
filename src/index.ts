@@ -1,15 +1,81 @@
 #!/usr/bin/env bun
 
-import { cp, mkdir, mkdtemp, rm, stat } from 'node:fs/promises';
-import * as os from 'node:os';
 import * as path from 'node:path';
 import ora from 'ora';
 import { loadConfig } from './lib/config';
-import { materializeSource } from './lib/materializeSource';
+import {
+	type ReferenceSyncProgressEvent,
+	runReferenceSync,
+} from './lib/runReferenceSync';
 import type { Config } from './schemas/config';
 
 function createSpinner(text: string) {
 	return ora({ text, discardStdin: false }).start();
+}
+
+const spinners = new Map<string, ReturnType<typeof createSpinner>>();
+
+function spinnerKey(event: ReferenceSyncProgressEvent): string {
+	switch (event.type) {
+		case 'source:start':
+		case 'source:success':
+		case 'source:failure':
+			return `source:${event.sourceIndex}`;
+		case 'mapping:start':
+		case 'mapping:success':
+		case 'mapping:failure':
+			return `mapping:${event.sourceIndex}:${event.mappingIndex}`;
+		case 'cleanup:start':
+		case 'cleanup:success':
+		case 'cleanup:failure':
+			return 'cleanup';
+	}
+}
+
+function handleProgress(event: ReferenceSyncProgressEvent) {
+	const key = spinnerKey(event);
+
+	switch (event.type) {
+		case 'source:start':
+			spinners.set(key, createSpinner(`Loading ${event.sourceType} source...`));
+			break;
+		case 'source:success':
+			spinners.get(key)?.succeed(`Loading ${event.sourceType} source...Done!`);
+			spinners.delete(key);
+			break;
+		case 'source:failure':
+			spinners.get(key)?.fail(`Loading ${event.sourceType} source...Failed!`);
+			spinners.delete(key);
+			break;
+		case 'mapping:start': {
+			const statusText = `Syncing ${event.fromPath} >> ${event.toPath}`;
+			spinners.set(key, createSpinner(`${statusText}...`));
+			break;
+		}
+		case 'mapping:success': {
+			const statusText = `Syncing ${event.fromPath} >> ${event.toPath}`;
+			spinners.get(key)?.succeed(`${statusText}...Done!`);
+			spinners.delete(key);
+			break;
+		}
+		case 'mapping:failure': {
+			const statusText = `Syncing ${event.fromPath} >> ${event.toPath}`;
+			spinners.get(key)?.fail(`${statusText}...Failed!`);
+			spinners.delete(key);
+			break;
+		}
+		case 'cleanup:start':
+			spinners.set(key, createSpinner(`Cleaning up..`));
+			break;
+		case 'cleanup:success':
+			spinners.get(key)?.succeed(`Cleaning up..Done!`);
+			spinners.delete(key);
+			break;
+		case 'cleanup:failure':
+			spinners.get(key)?.fail(`Cleaning up..Failed!`);
+			spinners.delete(key);
+			break;
+	}
 }
 
 let config: Config;
@@ -22,54 +88,18 @@ try {
 	process.exit(1);
 }
 
-const __tempDir = await mkdtemp(path.join(os.tmpdir(), 'synctool-'));
-
 if (!config.configPath) {
 	console.error('Config error: configPath not specified.');
 	process.exit(1);
 }
 
 const configDir = path.dirname(config.configPath);
+const result = await runReferenceSync({
+	config,
+	configDir,
+	onProgress: handleProgress,
+});
 
-for (const dep of config.sources) {
-	const sourceSpinner = createSpinner(`Loading ${dep.type} source...`);
-	let sourcePath: string;
-
-	try {
-		sourcePath = await materializeSource(dep, { tempDir: __tempDir });
-		sourceSpinner.succeed(`Loading ${dep.type} source...Done!`);
-	} catch (error) {
-		sourceSpinner.fail(`Loading ${dep.type} source...Failed!`);
-		throw error;
-	}
-
-	for (const map of dep.mappings) {
-		const fromPath =
-			'from' in map ? path.join(sourcePath, map.from) : sourcePath;
-		const mapsToDirectory = map.to.endsWith('/') || map.to.endsWith('\\');
-		const toPath =
-			'from' in map && mapsToDirectory
-				? path.join(configDir, map.to, path.basename(map.from))
-				: path.join(configDir, map.to);
-		const statusText = `Syncing ${fromPath} >> ${toPath}`;
-		const spinner = createSpinner(`${statusText}...`);
-
-		try {
-			const toExists =
-				(await stat(toPath, { throwIfNoEntry: false })) !== undefined;
-
-			if (toExists) await rm(toPath, { recursive: true, force: true });
-
-			await mkdir(path.dirname(toPath), { recursive: true });
-			await cp(fromPath, toPath, { recursive: true });
-			spinner.succeed(`${statusText}...Done!`);
-		} catch (error) {
-			spinner.fail(`${statusText}...Failed!`);
-			throw error;
-		}
-	}
+if (result.sources.some((source) => source.status === 'failed')) {
+	process.exitCode = 1;
 }
-
-const spinner = createSpinner(`Cleaning up..`);
-await rm(__tempDir, { recursive: true, force: true });
-spinner.succeed(`Cleaning up..Done!`);

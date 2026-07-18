@@ -1,4 +1,6 @@
 {
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "references"],
 	"compilerOptions": {
 		// Environment setup & latest features
 		"lib": ["ESNext"],
