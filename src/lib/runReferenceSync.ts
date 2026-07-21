@@ -3,6 +3,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import type { Config } from '../schemas/config';
 import type { Source } from '../schemas/source';
+import { applyMapping, planMapping } from './applyMapping';
 import { materializeSource as defaultMaterializeSource } from './materializeSource';
 import type { SourceContext } from './SourceContext';
 
@@ -137,48 +138,37 @@ export async function runReferenceSync({
 
 			let sourceFailed = false;
 			for (const [mappingIndex, map] of source.mappings.entries()) {
-				const fromPath =
-					'from' in map ? path.join(sourcePath, map.from) : sourcePath;
-				const mapsToDirectory = map.to.endsWith('/') || map.to.endsWith('\\');
-				const toPath =
-					'from' in map && mapsToDirectory
-						? path.join(configDir, map.to, path.basename(map.from))
-						: path.join(configDir, map.to);
+				const plan = planMapping({
+					mapping: map,
+					sourcePath,
+					configDir,
+				});
 
 				onProgress?.({
 					type: 'mapping:start',
 					sourceIndex,
 					mappingIndex,
-					fromPath,
-					toPath,
+					fromPath: plan.fromPath,
+					toPath: plan.toPath,
 				});
 
 				try {
-					const toExists =
-						(await fileSystem.stat(toPath, { throwIfNoEntry: false })) !==
-						undefined;
-
-					if (toExists) {
-						await fileSystem.rm(toPath, { recursive: true, force: true });
-					}
-
-					await fileSystem.mkdir(path.dirname(toPath), { recursive: true });
-					await fileSystem.cp(fromPath, toPath, { recursive: true });
+					await applyMapping({ plan, fileSystem });
 
 					onProgress?.({
 						type: 'mapping:success',
 						sourceIndex,
 						mappingIndex,
-						fromPath,
-						toPath,
+						fromPath: plan.fromPath,
+						toPath: plan.toPath,
 					});
 				} catch (error) {
 					onProgress?.({
 						type: 'mapping:failure',
 						sourceIndex,
 						mappingIndex,
-						fromPath,
-						toPath,
+						fromPath: plan.fromPath,
+						toPath: plan.toPath,
 						error,
 					});
 					results.push({
