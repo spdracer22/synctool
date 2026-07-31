@@ -1,6 +1,7 @@
 import type { cp, mkdir, rm, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import type { Mapping } from '../schemas/mapping';
+import type { MaterializedSource } from './materializeSource';
 
 export type MappingPlan = {
 	fromPath: string;
@@ -16,7 +17,7 @@ export type MappingFileSystem = {
 
 export type PlanMappingOptions = {
 	mapping: Mapping;
-	sourcePath: string;
+	materializedSource: MaterializedSource;
 	configDir: string;
 };
 
@@ -27,16 +28,34 @@ export type ApplyMappingOptions = {
 
 export function planMapping({
 	mapping,
-	sourcePath,
+	materializedSource,
 	configDir,
 }: PlanMappingOptions): MappingPlan {
-	const fromPath =
-		'from' in mapping ? path.join(sourcePath, mapping.from) : sourcePath;
 	const mapsToDirectory = mapping.to.endsWith('/') || mapping.to.endsWith('\\');
-	const toPath =
-		'from' in mapping && mapsToDirectory
-			? path.join(configDir, mapping.to, path.basename(mapping.from))
-			: path.join(configDir, mapping.to);
+
+	if (materializedSource.kind === 'single-file') {
+		return {
+			fromPath: materializedSource.path,
+			toPath: mapsToDirectory
+				? path.join(
+						configDir,
+						mapping.to,
+						path.basename(materializedSource.path),
+					)
+				: path.join(configDir, mapping.to),
+		};
+	}
+
+	if (!('from' in mapping)) {
+		throw new Error(
+			'Folder materializations require mappings with a from path',
+		);
+	}
+
+	const fromPath = path.join(materializedSource.path, mapping.from);
+	const toPath = mapsToDirectory
+		? path.join(configDir, mapping.to, path.basename(mapping.from))
+		: path.join(configDir, mapping.to);
 
 	return { fromPath, toPath };
 }

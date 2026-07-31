@@ -5,7 +5,6 @@ import type { Config } from '../schemas/config';
 import type { Source } from '../schemas/source';
 import { applyMapping, planMapping } from './applyMapping';
 import { materializeSource as defaultMaterializeSource } from './materializeSource';
-import type { SourceContext } from './SourceContext';
 
 export type ReferenceSyncProgressEvent =
 	| { type: 'source:start'; sourceIndex: number; sourceType: Source['type'] }
@@ -68,10 +67,7 @@ type TempDirs = {
 };
 
 export type RunReferenceSyncDependencies = {
-	materializeSource?: (
-		source: Source,
-		context: SourceContext,
-	) => Promise<string>;
+	materializeSource?: typeof defaultMaterializeSource;
 	fileSystem?: FileSystem;
 	tempDirs?: TempDirs;
 };
@@ -112,9 +108,11 @@ export async function runReferenceSync({
 				sourceType: source.type,
 			});
 
-			let sourcePath: string;
+			let materializedSource: Awaited<
+				ReturnType<typeof defaultMaterializeSource>
+			>;
 			try {
-				sourcePath = await materializeSource(source, { tempDir });
+				materializedSource = await materializeSource(source, { tempDir });
 				onProgress?.({
 					type: 'source:success',
 					sourceIndex,
@@ -137,10 +135,10 @@ export async function runReferenceSync({
 			}
 
 			let sourceFailed = false;
-			for (const [mappingIndex, map] of source.mappings.entries()) {
+			for (const [mappingIndex, map] of materializedSource.mappings.entries()) {
 				const plan = planMapping({
 					mapping: map,
-					sourcePath,
+					materializedSource,
 					configDir,
 				});
 
