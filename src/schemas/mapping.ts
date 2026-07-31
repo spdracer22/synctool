@@ -25,6 +25,6 @@ export const FromToMappingSchema = ToMappingSchema.extend({
 	from: RelativePathSchema,
 });
 
-export type Mapping =
-	| z.infer<typeof ToMappingSchema>
-	| z.infer<typeof FromToMappingSchema>;
+export type ToMapping = z.infer<typeof ToMappingSchema>;
+export type FromToMapping = z.infer<typeof FromToMappingSchema>;
+export type Mapping = ToMapping | FromToMapping;
