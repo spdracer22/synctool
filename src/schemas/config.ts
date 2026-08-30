@@ -7,4 +7,4 @@ export const ConfigSchema = z.object({
 	configPath: z.string().optional(),
 });
 
-export type Config = z.infer<typeof ConfigSchema>;
+export type Config = z.input<typeof ConfigSchema>;

@@ -9,8 +9,12 @@ External content copied into the project so changes are visible and reviewable i
 _Avoid_: dependency, package
 
 **Source**:
-An external or local origin that can be materialized before selected content is copied into the project.
+An external or local origin that can be materialized before selected content is copied or linked into the project.
 _Avoid_: provider, fetcher
+
+**Local source**:
+A source whose content already exists on the local filesystem and whose mappings can copy or link reference material into the project.
+_Avoid_: local-copy source, symlink source, local adapter
 
 **Materialized source**:
 A filesystem location containing a source's content in a form mappings can read from.

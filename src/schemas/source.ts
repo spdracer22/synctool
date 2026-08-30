@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import { CurlSourceSchema } from './source-curl';
 import { GitSourceSchema } from './source-git';
-import { LocalCopySourceSchema } from './source-local';
+import { LocalCopySourceSchema, LocalSourceSchema } from './source-local';
 
 export const SourceSchema = z.discriminatedUnion('type', [
 	GitSourceSchema,
 	CurlSourceSchema,
 	LocalCopySourceSchema,
+	LocalSourceSchema,
 ]);
 
-export type Source = z.infer<typeof SourceSchema>;
+export type Source = z.input<typeof SourceSchema>;

@@ -1,12 +1,13 @@
 import type { MaterializedSource } from '../lib/materializeSource';
-import type { LocalCopySource } from '../schemas/source-local';
+import type { LocalSource } from '../schemas/source-local';
 
 export async function localCopyAdapter(
-	source: LocalCopySource,
+	source: LocalSource,
 ): Promise<MaterializedSource> {
 	return {
 		kind: 'folder',
 		path: source.path,
+		operation: source.operation ?? 'copy',
 		mappings: source.mappings,
 	};
 }

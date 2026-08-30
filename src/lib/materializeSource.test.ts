@@ -32,6 +32,7 @@ describe('materializeSource', () => {
 		expect(result).toEqual({
 			kind: 'folder',
 			path: '/tmp/synctool-run/source-a',
+			operation: 'copy',
 			mappings: [{ from: 'docs', to: 'references/docs' }],
 		});
 		expect(mkdirCalls).toEqual([
@@ -89,6 +90,7 @@ describe('materializeSource', () => {
 			{
 				type: 'local-copy',
 				path: 'references/local',
+				operation: 'copy',
 				mappings: [{ from: 'skills', to: '.agents/skills' }],
 			},
 			{ tempDir: '/tmp/synctool-run' },
@@ -105,8 +107,31 @@ describe('materializeSource', () => {
 		expect(result).toEqual({
 			kind: 'folder',
 			path: 'references/local',
+			operation: 'copy',
 			mappings: [{ from: 'skills', to: '.agents/skills' }],
 		});
 		expect(mkdirCalls).toEqual([]);
+	});
+
+	test('materializes local sources with symlink operation', async () => {
+		const result = await materializeSource(
+			{
+				type: 'local',
+				path: '../shared',
+				operation: 'symlink',
+				mappings: [{ from: 'skills', to: '.agents/skills' }],
+			},
+			{ tempDir: '/tmp/synctool-run' },
+			{
+				fileSystem: { mkdir: async () => undefined },
+			},
+		);
+
+		expect(result).toEqual({
+			kind: 'folder',
+			path: '../shared',
+			operation: 'symlink',
+			mappings: [{ from: 'skills', to: '.agents/skills' }],
+		});
 	});
 });
