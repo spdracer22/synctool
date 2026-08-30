@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { randomUUIDv7 } from 'bun';
 import type { FromToMapping, ToMapping } from '../schemas/mapping';
 import type { Source } from '../schemas/source';
+import type { LocalOperation } from '../schemas/source-local';
 import { curlAdapter, getCurlDownloadFileName } from '../sources/curlAdapter';
 import { gitAdapter } from '../sources/gitAdapter';
 import { localCopyAdapter } from '../sources/localCopyAdapter';
@@ -12,6 +13,7 @@ export type MaterializedSource =
 	| {
 			kind: 'folder';
 			path: string;
+			operation: LocalOperation;
 			mappings: FromToMapping[];
 	  }
 	| {
@@ -106,6 +108,7 @@ export async function materializeSource(
 			);
 		}
 		case 'local-copy':
+		case 'local':
 			return localCopyAdapter(source);
 		default: {
 			const exhaustive: never = source;

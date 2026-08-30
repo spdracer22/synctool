@@ -22,6 +22,7 @@ export async function gitAdapter(
 	return {
 		kind: 'folder',
 		path: materializationDir,
+		operation: 'copy',
 		mappings: source.mappings,
 	};
 }

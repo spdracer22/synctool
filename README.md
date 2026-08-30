@@ -21,6 +21,7 @@ Out of the box, `synctool` supports:
 - git
 - simple download via `curl`
 - local file copy
+- local symlinks
 
 `synctool` provides a harness that:
  
@@ -83,15 +84,39 @@ This will clone the specified repos using Git's partial clone blob filter for ef
 **`sources`** (array, required)  
 A list of external sources to pull from. Each source has:
 
-- **`type`** (string) — Source type: `git`, `curl`, or `local-copy`
+- **`type`** (string) — Source type: `git`, `curl`, `local`, or `local-copy` (`local-copy` is a legacy alias of `local`)
 - For `git`: **`repo`** (string) — The Git URL of the repository to clone
 - For `curl`: **`url`** (string) — The URL of the file to download
 - For `curl`: **`extension`** (string, optional) — File extension to use when the URL does not include one. If omitted and the URL has no extension, the file is saved as `data`.
+- For `local` / `local-copy`: **`path`** (string) — Source path. Relative paths are resolved from the directory containing `synctool.json` and may point outside the project.
+- For `local` / `local-copy`: **`operation`** (`copy` or `symlink`, optional) — Whether mappings copy or symlink content. Defaults to `copy`.
 - **`mappings`** (array) — One or more source→destination mappings
   - **`from`** (string) — Relative path within the source to pull (ignored for non-unzipped `curl` downloads)
   - **`to`** (string) — Destination path relative to the directory containing `synctool.json`
 
-Mapping paths must be relative paths and must not escape their base directory. Absolute paths such as `C:/users/me/somedir/mattpocock/skills` or paths containing `..` are rejected.
+Mapping paths must be relative paths and must not escape their base directory. Absolute paths such as `C:/users/me/somedir/mattpocock/skills` or paths containing `..` are rejected. This restriction applies to mapping `from` and `to` paths, not to a local source's top-level `path`.
+
+A local source can symlink instead of copy:
+
+```json
+{
+  "sources": [
+    {
+      "type": "local",
+      "path": "../shared-reference",
+      "operation": "symlink",
+      "mappings": [
+        {
+          "from": "skills",
+          "to": ".agents/skills"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Symlink targets are created as relative links from the destination to the mapped source path. Existing destinations are replaced before linking, and missing source paths fail the mapping.
 
 ### Example Configuration
 

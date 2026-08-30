@@ -4,27 +4,7 @@
 			"type": "git",
 			"repo": "https://github.com/mattpocock/skills",
 			"mappings": [
-				{ "from": "skills", "to": "references/mattpocock/skills" },
-				{
-					"from": "skills/engineering/grill-with-docs",
-					"to": ".agents/skills/grill-with-docs"
-				},
-				{
-					"from": "skills/engineering/domain-modeling",
-					"to": ".agents/skills/domain-modeling"
-				},
-				{
-					"from": "skills/productivity/grilling",
-					"to": ".agents/skills/grilling"
-				},
-				{
-					"from": "skills/engineering/codebase-design",
-					"to": ".agents/skills/codebase-design"
-				},
-				{
-					"from": "skills/engineering/improve-codebase-architecture",
-					"to": ".agents/skills/improve-codebase-architecture"
-				}
+				{ "from": "skills", "to": "references/mattpocock/skills" }
 			]
 		},
 		{
@@ -45,6 +25,34 @@
 			"mappings": [
 				{ "to": "references/vertex-api/" },
 				{ "to": "references/vertex-api/spec/spec.yaml" }
+			]
+		},
+		{
+			"type": "local",
+			"operation": "symlink",
+			"path": "references/mattpocock/skills",
+			"mappings": [
+				{ "from": "engineering/to-spec", "to": ".agents/skills/to-spec" },
+				{
+					"from": "engineering/grill-with-docs",
+					"to": ".agents/skills/grill-with-docs"
+				},
+				{
+					"from": "engineering/domain-modeling",
+					"to": ".agents/skills/domain-modeling"
+				},
+				{
+					"from": "productivity/grilling",
+					"to": ".agents/skills/grilling"
+				},
+				{
+					"from": "engineering/codebase-design",
+					"to": ".agents/skills/codebase-design"
+				},
+				{
+					"from": "engineering/improve-codebase-architecture",
+					"to": ".agents/skills/improve-codebase-architecture"
+				}
 			]
 		}
 	]

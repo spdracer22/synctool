@@ -3,7 +3,11 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import type { Config } from '../schemas/config';
 import type { Source } from '../schemas/source';
-import { applyMapping, planMapping } from './applyMapping';
+import {
+	applyMapping,
+	type MappingProcesses,
+	planMapping,
+} from './applyMapping';
 import { materializeSource as defaultMaterializeSource } from './materializeSource';
 
 export type ReferenceSyncProgressEvent =
@@ -70,6 +74,7 @@ export type RunReferenceSyncDependencies = {
 	materializeSource?: typeof defaultMaterializeSource;
 	fileSystem?: FileSystem;
 	tempDirs?: TempDirs;
+	processes?: Partial<MappingProcesses>;
 };
 
 export type RunReferenceSyncOptions = {
@@ -96,6 +101,7 @@ export async function runReferenceSync({
 		dependencies.materializeSource ?? defaultMaterializeSource;
 	const fileSystem = dependencies.fileSystem ?? defaultFileSystem;
 	const tempDirs = dependencies.tempDirs ?? defaultTempDirs;
+	const processes = dependencies.processes;
 	const tempDir = await tempDirs.create();
 	const results: ReferenceSyncSourceResult[] = [];
 
@@ -151,7 +157,7 @@ export async function runReferenceSync({
 				});
 
 				try {
-					await applyMapping({ plan, fileSystem });
+					await applyMapping({ plan, fileSystem, processes });
 
 					onProgress?.({
 						type: 'mapping:success',
