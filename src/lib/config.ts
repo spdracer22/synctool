@@ -18,8 +18,7 @@ export function resolveExplicitConfigPath(configPath: string): string {
 		: path.resolve(process.cwd(), configPath);
 }
 
-export async function loadConfigFromPath(configPath: string): Promise<Config> {
-	const resolvedPath = resolveExplicitConfigPath(configPath);
+async function loadConfigAtResolvedPath(resolvedPath: string): Promise<Config> {
 	const configFile = file(resolvedPath);
 
 	if (!(await configFile.exists())) {
@@ -44,6 +43,10 @@ export async function loadConfigFromPath(configPath: string): Promise<Config> {
 	}
 }
 
+export async function loadConfigFromPath(configPath: string): Promise<Config> {
+	return loadConfigAtResolvedPath(resolveExplicitConfigPath(configPath));
+}
+
 export async function loadConfig(): Promise<Config> {
 	const configFile = await findUp('synctool.json');
 
@@ -51,8 +54,5 @@ export async function loadConfig(): Promise<Config> {
 		throw new Error('synctool.json not found');
 	}
 
-	const jsonData = await file(configFile).json();
-	const validated = ConfigSchema.parse(jsonData);
-
-	return { ...validated, configPath: configFile };
+	return loadConfigAtResolvedPath(configFile);
 }

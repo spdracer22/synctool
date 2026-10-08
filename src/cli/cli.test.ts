@@ -180,6 +180,46 @@ describe('synctool CLI', () => {
 		expect(result.stderr).not.toContain('synctool.json not found');
 	});
 
+	test('explicit configuration accepts an absolute path', async () => {
+		const projectDir = await createTempDir();
+		const sourceDir = path.join(projectDir, 'source');
+		await mkdir(path.join(sourceDir, 'skills'), { recursive: true });
+		await writeFile(path.join(sourceDir, 'skills', 'example.txt'), 'hello');
+
+		const configPath = path.join(projectDir, 'custom.json');
+		await writeFile(
+			configPath,
+			JSON.stringify({
+				sources: [
+					{
+						type: 'local',
+						path: sourceDir,
+						mappings: [{ from: 'skills', to: 'refs/skills' }],
+					},
+				],
+			}),
+		);
+
+		const result = runSynctool(['-c', configPath], projectDir);
+
+		expect(result.exitCode).toBe(0);
+		expect(
+			await Bun.file(
+				path.join(projectDir, 'refs', 'skills', 'example.txt'),
+			).exists(),
+		).toBe(true);
+	});
+
+	test('explicit invalid configuration exits with a helpful error', async () => {
+		const cwd = await createTempDir();
+		await writeFile(path.join(cwd, 'broken.json'), '{ not json');
+
+		const result = runSynctool(['--config=broken.json'], cwd);
+
+		expect(result.exitCode).toBe(1);
+		expect(result.stderr).toContain('Configuration is not valid JSON');
+	});
+
 	test('rejects repeated configuration options with a non-zero exit', async () => {
 		const cwd = await createTempDir();
 		const result = runSynctool(['--config=a.json', '--config=b.json'], cwd);

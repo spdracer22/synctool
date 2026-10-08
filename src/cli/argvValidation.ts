@@ -24,12 +24,8 @@ export function formatArgvError(message: string): string {
 	return `error: ${message}`;
 }
 
-export function hasExplicitConfigSelection(args: string[]): boolean {
-	return getExplicitConfigPath(args) !== null;
-}
-
-function countConfigSelections(args: string[]): number {
-	let count = 0;
+function collectExplicitConfigPaths(args: string[]): string[] {
+	const paths: string[] = [];
 
 	for (let index = 0; index < args.length; index += 1) {
 		const arg = args[index];
@@ -38,12 +34,15 @@ function countConfigSelections(args: string[]): number {
 		}
 
 		if (arg.startsWith('--config=')) {
-			count += 1;
+			paths.push(arg.slice('--config='.length));
 			continue;
 		}
 
 		if (arg === '--config' || arg === '-c') {
-			count += 1;
+			const value = args[index + 1];
+			if (value !== undefined) {
+				paths.push(value);
+			}
 			index += 1;
 			continue;
 		}
@@ -52,46 +51,25 @@ function countConfigSelections(args: string[]): number {
 			const shortArgs = arg.slice(1);
 			for (const char of shortArgs) {
 				if (char === 'c') {
-					count += 1;
+					const value = args[index + 1];
+					if (value !== undefined) {
+						paths.push(value);
+					}
 					index += 1;
 				}
 			}
 		}
 	}
 
-	return count;
+	return paths;
 }
 
 export function getExplicitConfigPath(args: string[]): string | null {
-	for (let index = 0; index < args.length; index += 1) {
-		const arg = args[index];
-		if (arg === undefined) {
-			continue;
-		}
-
-		if (arg.startsWith('--config=')) {
-			return arg.slice('--config='.length);
-		}
-
-		if (arg === '--config' || arg === '-c') {
-			return args[index + 1] ?? null;
-		}
-
-		if (arg.startsWith('-') && arg.length > 1 && !arg.startsWith('--')) {
-			const shortArgs = arg.slice(1);
-			for (const char of shortArgs) {
-				if (char === 'c') {
-					return args[index + 1] ?? null;
-				}
-			}
-		}
-	}
-
-	return null;
+	return collectExplicitConfigPaths(args)[0] ?? null;
 }
 
 export function validateArgv(args: string[]): string | null {
-	if (countConfigSelections(args) > 1) {
+	if (collectExplicitConfigPaths(args).length > 1) {
 		return formatArgvError(
 			"option '--config' cannot be specified more than once",
 		);
