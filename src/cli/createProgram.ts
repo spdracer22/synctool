@@ -1,8 +1,39 @@
 import { Command } from 'commander';
-import { formatHelpExamples } from './helpExamples';
+import { emptySourcesConfigExample, formatHelpExamples } from './helpExamples';
 
-function configureCommandTree(_program: Command): void {
-	// Reserved for init and other subcommands (issues #8–#9).
+function formatInitHelpExamples(): string {
+	return `
+Configuration example:
+
+Empty sources (no-op reference sync run):
+
+${emptySourcesConfigExample}
+`.trimEnd();
+}
+
+function configureCommandTree(program: Command): void {
+	program
+		.command('init')
+		.description(
+			'Create a minimal configuration file with an empty sources list at the selected path.',
+		)
+		.helpOption(
+			'-h, --help',
+			'Show init help and the no-op configuration example.',
+		)
+		.addHelpText('after', `\n${formatInitHelpExamples()}\n`);
+}
+
+export function outputInitHelp(program: Command): void {
+	const initCommand = program.commands.find(
+		(command) => command.name() === 'init',
+	);
+	if (initCommand) {
+		initCommand.outputHelp();
+		return;
+	}
+
+	program.outputHelp();
 }
 
 export function createProgram(): Command {

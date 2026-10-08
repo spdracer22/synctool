@@ -48,9 +48,39 @@ bun install -g @spdracer22/synctool
 npm install -g @spdracer22/synctool
 ```
 
+### Initialize a configuration file
+
+Create a minimal `synctool.json` in the current directory with an empty `sources` list (a valid no-op configuration):
+
+```bash
+synctool init
+```
+
+By default, `init` writes `./synctool.json`. To create a different file, pass the same configuration path options used for reference sync runs (`--config`, `--config=path`, or `-c path`) before or after `init`. Relative paths are resolved from your current working directory.
+
+```bash
+synctool init --config configs/sync.json
+synctool --config=./alt/synctool.json init
+synctool init -c custom.json
+```
+
+`init` never searches parent directories for an existing configuration and does not start a reference sync run.
+
+If the target file already exists, synctool reports that it is already present and exits successfully without changing the file. Creation is exclusive: concurrent `init` commands cannot overwrite an existing file.
+
+If the parent directory for the target path does not exist, or the file cannot be written for another reason, synctool prints a short error and exits with a non-zero status. Parent directories are not created implicitly.
+
+Show `init` usage and the no-op configuration example without reading or creating a file:
+
+```bash
+synctool init --help
+```
+
+Root help (`synctool --help`) lists `init` alongside configuration selection options.
+
 ### Create a Configuration File
 
-In your project root, create a `synctool.json` file that defines what to sync:
+You can also create `synctool.json` manually. In your project root, define what to sync:
 
 ```json
 {
