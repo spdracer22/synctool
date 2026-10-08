@@ -97,6 +97,10 @@ export async function runReferenceSync({
 	onProgress,
 	dependencies = {},
 }: RunReferenceSyncOptions): Promise<ReferenceSyncResult> {
+	if (config.sources.length === 0) {
+		return { sources: [] };
+	}
+
 	const materializeSource =
 		dependencies.materializeSource ?? defaultMaterializeSource;
 	const fileSystem = dependencies.fileSystem ?? defaultFileSystem;

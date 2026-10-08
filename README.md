@@ -106,12 +106,14 @@ Unknown commands, unknown options, missing option values, and extra positional a
 
 This will clone the specified repos using Git's partial clone blob filter for efficiency, copy the mapped directories to their configured `to` paths relative to the directory containing `synctool.json`, and clean up temporary files.
 
+If `sources` is an empty array, synctool validates the configuration, prints `No sources configured; nothing to sync.`, and exits successfully without fetching sources or applying mappings.
+
 ## Configuration
 
 ### synctool.json Schema
 
 **`sources`** (array, required)  
-A list of external sources to pull from. Each source has:
+A list of external sources to pull from. An empty array is valid: synctool reports that nothing is configured to sync and exits successfully without running sources. Each source has:
 
 - **`type`** (string) — Source type: `git`, `curl`, `local`, or `local-copy` (`local-copy` is a legacy alias of `local`)
 - For `git`: **`repo`** (string) — The Git URL of the repository to clone
