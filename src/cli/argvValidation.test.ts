@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test';
-import { isHelpOnlyArgv, validateArgv } from './argvValidation';
+import {
+	getExplicitConfigPath,
+	isHelpOnlyArgv,
+	validateArgv,
+} from './argvValidation';
 
 describe('validateArgv', () => {
 	test('accepts an empty invocation', () => {
@@ -47,6 +51,30 @@ describe('validateArgv', () => {
 	test('rejects unknown long options with values', () => {
 		expect(validateArgv(['--config=./synctool.json'])).toBeNull();
 		expect(validateArgv(['--wat=value'])).toBe('error: unknown option `--wat`');
+	});
+
+	test('rejects repeated configuration options', () => {
+		expect(validateArgv(['--config=a.json', '--config=b.json'])).toBe(
+			"error: option '--config' cannot be specified more than once",
+		);
+		expect(validateArgv(['-c', 'a.json', '--config=b.json'])).toBe(
+			"error: option '--config' cannot be specified more than once",
+		);
+	});
+});
+
+describe('getExplicitConfigPath', () => {
+	test('reads --config, --config=, and -c forms', () => {
+		expect(getExplicitConfigPath(['--config', './sync.json'])).toBe(
+			'./sync.json',
+		);
+		expect(getExplicitConfigPath(['--config=./sync.json'])).toBe('./sync.json');
+		expect(getExplicitConfigPath(['-c', './sync.json'])).toBe('./sync.json');
+	});
+
+	test('returns null when no configuration option is present', () => {
+		expect(getExplicitConfigPath([])).toBeNull();
+		expect(getExplicitConfigPath(['--help'])).toBeNull();
 	});
 });
 

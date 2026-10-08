@@ -1,6 +1,6 @@
 import { runReferenceSyncCli } from '../runReferenceSyncCli';
 import {
-	hasExplicitConfigSelection,
+	getExplicitConfigPath,
 	hasHelpRequest,
 	validateArgv,
 } from './argvValidation';
@@ -20,12 +20,11 @@ export async function runCli(argv: string[]): Promise<number> {
 		return 0;
 	}
 
-	if (hasExplicitConfigSelection(userArgs)) {
-		console.error(
-			'error: explicit configuration selection is not available yet',
-		);
-		return 1;
-	}
+	const explicitConfigPath = getExplicitConfigPath(userArgs);
 
-	return runReferenceSyncCli();
+	return runReferenceSyncCli(
+		explicitConfigPath === null
+			? undefined
+			: { configPath: explicitConfigPath },
+	);
 }

@@ -108,6 +108,86 @@ describe('synctool CLI', () => {
 		expect(result.stderr).toContain('unknown option');
 	});
 
+	test('explicit configuration resolves relative paths from the working directory', async () => {
+		const projectDir = await createTempDir();
+		const configDir = path.join(projectDir, 'configs');
+		const nestedDir = path.join(projectDir, 'nested');
+		await mkdir(configDir, { recursive: true });
+		await mkdir(nestedDir, { recursive: true });
+
+		const sourceDir = path.join(projectDir, 'source');
+		await mkdir(path.join(sourceDir, 'skills'), { recursive: true });
+		await writeFile(path.join(sourceDir, 'skills', 'example.txt'), 'hello');
+
+		await writeFile(
+			path.join(projectDir, 'synctool.json'),
+			JSON.stringify({
+				sources: [
+					{
+						type: 'local',
+						path: sourceDir,
+						mappings: [{ from: 'skills', to: 'refs/parent-only' }],
+					},
+				],
+			}),
+		);
+
+		await writeFile(
+			path.join(configDir, 'sync.json'),
+			JSON.stringify({
+				sources: [
+					{
+						type: 'local',
+						path: sourceDir,
+						mappings: [{ from: 'skills', to: 'refs/explicit' }],
+					},
+				],
+			}),
+		);
+
+		const result = runSynctool(
+			['--config', path.join('..', 'configs', 'sync.json')],
+			nestedDir,
+		);
+
+		expect(result.exitCode).toBe(0);
+		expect(
+			await Bun.file(
+				path.join(configDir, 'refs', 'explicit', 'example.txt'),
+			).exists(),
+		).toBe(true);
+		expect(
+			await Bun.file(
+				path.join(projectDir, 'refs', 'parent-only', 'example.txt'),
+			).exists(),
+		).toBe(false);
+	});
+
+	test('explicit configuration does not discover synctool.json upward', async () => {
+		const projectDir = await createTempDir();
+		const nestedDir = path.join(projectDir, 'nested');
+		await mkdir(nestedDir, { recursive: true });
+
+		await writeFile(
+			path.join(projectDir, 'synctool.json'),
+			JSON.stringify({ sources: [] }),
+		);
+
+		const result = runSynctool(['--config', 'missing.json'], nestedDir);
+
+		expect(result.exitCode).toBe(1);
+		expect(result.stderr).toContain('Configuration not found');
+		expect(result.stderr).not.toContain('synctool.json not found');
+	});
+
+	test('rejects repeated configuration options with a non-zero exit', async () => {
+		const cwd = await createTempDir();
+		const result = runSynctool(['--config=a.json', '--config=b.json'], cwd);
+
+		expect(result.exitCode).toBe(1);
+		expect(result.stderr).toContain('cannot be specified more than once');
+	});
+
 	test('bare invocation discovers configuration upward and exits non-zero for failed sources', async () => {
 		const projectDir = await createTempDir();
 		const nestedDir = path.join(projectDir, 'nested');

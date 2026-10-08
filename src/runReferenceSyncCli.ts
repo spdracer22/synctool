@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import ora from 'ora';
-import { loadConfig } from './lib/config';
+import { loadConfig, loadConfigFromPath } from './lib/config';
 import {
 	type ReferenceSyncProgressEvent,
 	runReferenceSync,
@@ -76,10 +76,19 @@ function handleProgress(event: ReferenceSyncProgressEvent) {
 	}
 }
 
-export async function runReferenceSyncCli(): Promise<number> {
+export type RunReferenceSyncCliOptions = {
+	configPath?: string;
+};
+
+export async function runReferenceSyncCli(
+	options?: RunReferenceSyncCliOptions,
+): Promise<number> {
 	let config: Config;
 	try {
-		config = await loadConfig();
+		config =
+			options?.configPath === undefined
+				? await loadConfig()
+				: await loadConfigFromPath(options.configPath);
 	} catch (error) {
 		console.error(
 			error instanceof Error ? error.message : 'Failed to load config',

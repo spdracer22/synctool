@@ -77,6 +77,20 @@ synctool
 
 Running `synctool` with no arguments performs a **reference sync run**: it discovers `synctool.json` in the current directory or a parent directory, materializes each configured source, and applies mappings to refresh reference material in your project.
 
+### Custom configuration file
+
+To run against a specific configuration file instead of upward discovery, pass `--config`, `--config=path`, or `-c path`. Relative paths are resolved from your current working directory; absolute paths are used as given. Synctool does not search parent directories or fall back to `synctool.json` when you select a configuration explicitly.
+
+Mapping `to` paths and relative local source `path` values are still resolved from the directory that contains the selected configuration file, not from the directory where you invoke the CLI.
+
+```bash
+synctool --config configs/sync.json
+synctool --config=./alt/synctool.json
+synctool -c /absolute/path/to/synctool.json
+```
+
+Missing files, invalid JSON, and schema validation errors exit with a non-zero status and a short error message. Supplying the configuration option more than once (including mixed `-c` and `--config` forms) is rejected.
+
 ### CLI help and validation
 
 Show usage, options, and configuration examples without loading a configuration or starting a reference sync run:

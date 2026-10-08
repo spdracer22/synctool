@@ -25,6 +25,12 @@ export function formatArgvError(message: string): string {
 }
 
 export function hasExplicitConfigSelection(args: string[]): boolean {
+	return getExplicitConfigPath(args) !== null;
+}
+
+function countConfigSelections(args: string[]): number {
+	let count = 0;
+
 	for (let index = 0; index < args.length; index += 1) {
 		const arg = args[index];
 		if (arg === undefined) {
@@ -32,18 +38,65 @@ export function hasExplicitConfigSelection(args: string[]): boolean {
 		}
 
 		if (arg.startsWith('--config=')) {
-			return true;
+			count += 1;
+			continue;
 		}
 
 		if (arg === '--config' || arg === '-c') {
-			return true;
+			count += 1;
+			index += 1;
+			continue;
+		}
+
+		if (arg.startsWith('-') && arg.length > 1 && !arg.startsWith('--')) {
+			const shortArgs = arg.slice(1);
+			for (const char of shortArgs) {
+				if (char === 'c') {
+					count += 1;
+					index += 1;
+				}
+			}
 		}
 	}
 
-	return false;
+	return count;
+}
+
+export function getExplicitConfigPath(args: string[]): string | null {
+	for (let index = 0; index < args.length; index += 1) {
+		const arg = args[index];
+		if (arg === undefined) {
+			continue;
+		}
+
+		if (arg.startsWith('--config=')) {
+			return arg.slice('--config='.length);
+		}
+
+		if (arg === '--config' || arg === '-c') {
+			return args[index + 1] ?? null;
+		}
+
+		if (arg.startsWith('-') && arg.length > 1 && !arg.startsWith('--')) {
+			const shortArgs = arg.slice(1);
+			for (const char of shortArgs) {
+				if (char === 'c') {
+					return args[index + 1] ?? null;
+				}
+			}
+		}
+	}
+
+	return null;
 }
 
 export function validateArgv(args: string[]): string | null {
+	if (countConfigSelections(args) > 1) {
+		return formatArgvError(
+			"option '--config' cannot be specified more than once",
+		);
+	}
+
 	for (let index = 0; index < args.length; index += 1) {
 		const arg = args[index];
 		if (arg === undefined) {
