@@ -93,6 +93,11 @@ if (!config.configPath) {
 	process.exit(1);
 }
 
+if (config.sources.length === 0) {
+	console.log('No sources configured; nothing to sync.');
+	process.exit(0);
+}
+
 const configDir = path.dirname(config.configPath);
 const result = await runReferenceSync({
 	config,
