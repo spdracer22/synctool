@@ -26,7 +26,7 @@ describe('synctool CLI', () => {
 		]);
 
 		expect(exitCode).toBe(0);
-		expect(stdout.trim()).toBe('No sources configured; nothing to sync.');
+		expect(stdout).toBe('No sources configured; nothing to sync.\n');
 		expect(stderr).not.toContain('Cleaning up');
 		expect(stderr).not.toContain('Loading');
 	});
