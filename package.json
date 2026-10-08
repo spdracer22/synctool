@@ -23,6 +23,7 @@
 		"typescript": "6.0.3"
 	},
 	"dependencies": {
+		"commander": "^13.0.0",
 		"find-up": "^8.0.0",
 		"ora": "^9.4.0",
 		"zod": "^4.4.3"
