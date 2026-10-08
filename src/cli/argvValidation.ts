@@ -68,6 +68,40 @@ export function getExplicitConfigPath(args: string[]): string | null {
 	return collectExplicitConfigPaths(args)[0] ?? null;
 }
 
+export function isInitInvocation(args: string[]): boolean {
+	for (let index = 0; index < args.length; index += 1) {
+		const arg = args[index];
+		if (arg === undefined) {
+			continue;
+		}
+
+		if (arg.startsWith('--config=')) {
+			continue;
+		}
+
+		if (arg === '--config' || arg === '-c') {
+			index += 1;
+			continue;
+		}
+
+		if (arg.startsWith('-') && arg.length > 1 && !arg.startsWith('--')) {
+			const shortArgs = arg.slice(1);
+			for (const char of shortArgs) {
+				if (char === 'c') {
+					index += 1;
+				}
+			}
+			continue;
+		}
+
+		if (arg === 'init') {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 export function validateArgv(args: string[]): string | null {
 	if (collectExplicitConfigPaths(args).length > 1) {
 		return formatArgvError(
@@ -75,9 +109,19 @@ export function validateArgv(args: string[]): string | null {
 		);
 	}
 
+	let initCount = 0;
+
 	for (let index = 0; index < args.length; index += 1) {
 		const arg = args[index];
 		if (arg === undefined) {
+			continue;
+		}
+
+		if (arg === 'init') {
+			initCount += 1;
+			if (initCount > 1) {
+				return formatArgvError('unexpected duplicate command `init`');
+			}
 			continue;
 		}
 

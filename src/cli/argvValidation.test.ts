@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import {
 	getExplicitConfigPath,
 	isHelpOnlyArgv,
+	isInitInvocation,
 	validateArgv,
 } from './argvValidation';
 
@@ -16,8 +17,25 @@ describe('validateArgv', () => {
 		expect(validateArgv(['-h', '--help'])).toBeNull();
 	});
 
+	test('accepts init with configuration options before or after the command', () => {
+		expect(validateArgv(['init'])).toBeNull();
+		expect(validateArgv(['--config', './custom.json', 'init'])).toBeNull();
+		expect(validateArgv(['init', '--config=./custom.json'])).toBeNull();
+		expect(validateArgv(['-c', './custom.json', 'init'])).toBeNull();
+		expect(validateArgv(['init', '-c', './custom.json'])).toBeNull();
+	});
+
 	test('rejects unknown commands', () => {
-		expect(validateArgv(['init'])).toBe('error: unknown command `init`');
+		expect(validateArgv(['wat'])).toBe('error: unknown command `wat`');
+	});
+
+	test('rejects extra positional arguments with init', () => {
+		expect(validateArgv(['init', 'extra'])).toBe(
+			'error: unknown command `extra`',
+		);
+		expect(validateArgv(['init', 'init'])).toBe(
+			'error: unexpected duplicate command `init`',
+		);
 	});
 
 	test('rejects unknown options', () => {
@@ -75,6 +93,15 @@ describe('getExplicitConfigPath', () => {
 	test('returns null when no configuration option is present', () => {
 		expect(getExplicitConfigPath([])).toBeNull();
 		expect(getExplicitConfigPath(['--help'])).toBeNull();
+	});
+});
+
+describe('isInitInvocation', () => {
+	test('detects init without treating a configuration path named init as the command', () => {
+		expect(isInitInvocation(['init'])).toBe(true);
+		expect(isInitInvocation(['--config', 'init'])).toBe(false);
+		expect(isInitInvocation(['--config=init'])).toBe(false);
+		expect(isInitInvocation(['init', '--config=./custom.json'])).toBe(true);
 	});
 });
 
