@@ -1,59 +1,26 @@
 {
-	"sources": [
-		{
-			"type": "git",
-			"repo": "https://github.com/mattpocock/skills",
-			"mappings": [
-				{ "from": "skills", "to": "references/mattpocock/skills" }
-			]
-		},
-		{
-			"type": "git",
-			"repo": "https://github.com/microsoft/playwright-cli",
-			"mappings": [
-				{ "from": "skills", "to": "references/playwright-cli/skills" }
-			]
-		},
-		{
-			"type": "git",
-			"repo": "https://github.com/anthropics/skills",
-			"mappings": [{ "from": "skills", "to": "references/anthropics/skills" }]
-		},
-		{
-			"type": "curl",
-			"url": "https://platform.vertexvis.com/spec",
-			"mappings": [
-				{ "to": "references/vertex-api/" },
-				{ "to": "references/vertex-api/spec/spec.yaml" }
-			]
-		},
-		{
-			"type": "local",
-			"operation": "symlink",
-			"path": "references/mattpocock/skills",
-			"mappings": [
-				{ "from": "engineering/to-spec", "to": ".agents/skills/to-spec" },
-				{
-					"from": "engineering/grill-with-docs",
-					"to": ".agents/skills/grill-with-docs"
-				},
-				{
-					"from": "engineering/domain-modeling",
-					"to": ".agents/skills/domain-modeling"
-				},
-				{
-					"from": "productivity/grilling",
-					"to": ".agents/skills/grilling"
-				},
-				{
-					"from": "engineering/codebase-design",
-					"to": ".agents/skills/codebase-design"
-				},
-				{
-					"from": "engineering/improve-codebase-architecture",
-					"to": ".agents/skills/improve-codebase-architecture"
-				}
-			]
-		}
-	]
+  "sources": [
+    {
+      "type": "git",
+      "repo": "https://github.com/spdracer22/dev-tools",
+      "mappings": [
+        {
+          "from": "skills/engineering",
+          "to": ".agents/skills/engineering"
+        },
+        {
+          "from": "skills/productivity",
+          "to": ".agents/skills/productivity"
+        },
+        {
+          "from": "skills/setup",
+          "to": ".agents/skills/setup"
+        },
+        {
+          "from": "skills/tools-and-frameworks",
+          "to": ".agents/skills/tools-and-frameworks"
+        }
+      ]
+    }
+  ]
 }
