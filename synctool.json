@@ -1,26 +1,37 @@
 {
-  "sources": [
-    {
-      "type": "git",
-      "repo": "https://github.com/spdracer22/dev-tools",
-      "mappings": [
-        {
-          "from": "skills/engineering",
-          "to": ".agents/skills/engineering"
-        },
-        {
-          "from": "skills/productivity",
-          "to": ".agents/skills/productivity"
-        },
-        {
-          "from": "skills/setup",
-          "to": ".agents/skills/setup"
-        },
-        {
-          "from": "skills/tools-and-frameworks",
-          "to": ".agents/skills/tools-and-frameworks"
-        }
-      ]
-    }
-  ]
+	"sources": [
+		{
+			"type": "git",
+			"repo": "https://github.com/spdracer22/dev-tools",
+			"mappings": [
+				{
+					"from": "skills/engineering",
+					"to": ".agents/skills/engineering"
+				},
+				{
+					"from": "skills/productivity",
+					"to": ".agents/skills/productivity"
+				},
+				{
+					"from": "skills/setup",
+					"to": ".agents/skills/setup"
+				},
+				{
+					"from": "skills/tools-and-frameworks",
+					"to": ".agents/skills/tools-and-frameworks"
+				}
+			]
+		},
+		{
+			"type": "local",
+			"operation": "symlink",
+			"path": "skills",
+			"mappings": [
+				{
+					"from": "implement-afk",
+					"to": ".agents/skills/engineering/implement-afk"
+				}
+			]
+		}
+	]
 }
