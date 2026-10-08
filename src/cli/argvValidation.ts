@@ -24,7 +24,9 @@ export function formatArgvError(message: string): string {
 	return `error: ${message}`;
 }
 
-export function hasExplicitConfigSelection(args: string[]): boolean {
+function collectExplicitConfigPaths(args: string[]): string[] {
+	const paths: string[] = [];
+
 	for (let index = 0; index < args.length; index += 1) {
 		const arg = args[index];
 		if (arg === undefined) {
@@ -32,18 +34,47 @@ export function hasExplicitConfigSelection(args: string[]): boolean {
 		}
 
 		if (arg.startsWith('--config=')) {
-			return true;
+			paths.push(arg.slice('--config='.length));
+			continue;
 		}
 
 		if (arg === '--config' || arg === '-c') {
-			return true;
+			const value = args[index + 1];
+			if (value !== undefined) {
+				paths.push(value);
+			}
+			index += 1;
+			continue;
+		}
+
+		if (arg.startsWith('-') && arg.length > 1 && !arg.startsWith('--')) {
+			const shortArgs = arg.slice(1);
+			for (const char of shortArgs) {
+				if (char === 'c') {
+					const value = args[index + 1];
+					if (value !== undefined) {
+						paths.push(value);
+					}
+					index += 1;
+				}
+			}
 		}
 	}
 
-	return false;
+	return paths;
+}
+
+export function getExplicitConfigPath(args: string[]): string | null {
+	return collectExplicitConfigPaths(args)[0] ?? null;
 }
 
 export function validateArgv(args: string[]): string | null {
+	if (collectExplicitConfigPaths(args).length > 1) {
+		return formatArgvError(
+			"option '--config' cannot be specified more than once",
+		);
+	}
+
 	for (let index = 0; index < args.length; index += 1) {
 		const arg = args[index];
 		if (arg === undefined) {
