@@ -75,6 +75,21 @@ In your project root, create a `synctool.json` file that defines what to sync:
 synctool
 ```
 
+Running `synctool` with no arguments performs a **reference sync run**: it discovers `synctool.json` in the current directory or a parent directory, materializes each configured source, and applies mappings to refresh reference material in your project.
+
+### CLI help and validation
+
+Show usage, options, and configuration examples without loading a configuration or starting a reference sync run:
+
+```bash
+synctool --help
+synctool -h
+```
+
+Help output includes an empty-sources configuration example and a minimal local-source example you can adapt when creating `synctool.json`.
+
+Unknown commands, unknown options, missing option values, and extra positional arguments exit with a non-zero status and a short error message. Malformed arguments are rejected even when `--help` or `-h` is also present.
+
 This will clone the specified repos using Git's partial clone blob filter for efficiency, copy the mapped directories to their configured `to` paths relative to the directory containing `synctool.json`, and clean up temporary files.
 
 ## Configuration
